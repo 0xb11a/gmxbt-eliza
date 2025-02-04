@@ -38,7 +38,7 @@ class GMXBTService extends Service {
   }
 
   async runCron(): Promise<void> {
-    cron.schedule("*/20 * * * *", async () => {
+    cron.schedule("* */3 * * *", async () => {
       elizaLogger.log("Run updatePortfolioTweet at", new Date().toUTCString());
       await this.updatePortfolioTweet();
     });
