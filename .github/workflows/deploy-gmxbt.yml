@@ -12,7 +12,7 @@ jobs:
     env:
       appFolder: /eliza/app-gmxbt
       projectName: eliza-gmxbt
-      repo: git@github.com:0xb11a/eliza.git
+      repo: git@github.com:0xb11a/gmxbt-eliza.git
 
     steps:
       - name: Checkout code
