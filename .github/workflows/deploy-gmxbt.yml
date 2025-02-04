@@ -46,6 +46,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} " \
             cd ${{ env.appFolder }} && \
             export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} && \
+            export OPENAI_API_KEY=${{ secrets.TWITTER_PASSWORD }} && \
+            export OPENAI_API_KEY=${{ secrets.TWITTER_2FA_SECRET }} && \
             docker compose -f docker-compose-gmxbt.yaml down && \
             docker compose -p ${{ env.projectName }} -f docker-compose-gmxbt.yaml up -d --build"
 
