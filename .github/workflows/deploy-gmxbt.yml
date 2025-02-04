@@ -1,0 +1,56 @@
+name: Deploy Gmxbt branch to Google VPS
+
+on:
+  push:
+    branches:
+      - gmxbt
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      appFolder: /eliza/app-gmxbt
+      projectName: eliza-gmxbt
+      repo: git@github.com:0xb11a/eliza.git
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
+
+      - name: Clone repository or pull latest changes
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            if [ -d "${{ env.appFolder }}/.git" ]; then
+              cd ${{ env.appFolder }}
+              git fetch origin gmxbt
+              if git rev-parse --verify origin/gmxbt > /dev/null 2>&1; then
+                git checkout gmxbt
+                git pull origin gmxbt
+              else
+                echo "Branch gmxbt not found!"
+                exit 1
+              fi
+            else
+              git clone -b gmxbt --single-branch ${{env.repo}} ${{ env.appFolder }}
+            fi
+          EOF
+
+      - name: Deploy to VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} " \
+            cd ${{ env.appFolder }} && \
+            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} && \
+            docker compose -f docker-compose-gmxbt.yaml down && \
+            docker compose -p ${{ env.projectName }} -f docker-compose-gmxbt.yaml up -d --build"
+
+      - name: Clean up unused Docker resources
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            docker system prune -f
+          EOF
