@@ -43,7 +43,7 @@ class GMXBTService extends Service {
       await this.updatePortfolioTweet();
     });
 
-    elizaLogger.log("TwitterPostJobService cron has been started");
+    elizaLogger.log("GMXBTService cron has been started");
   }
 
   async updatePortfolioTweet(): Promise<void> {
