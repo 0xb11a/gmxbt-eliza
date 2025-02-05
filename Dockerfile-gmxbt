@@ -33,14 +33,12 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 # Set the working directory
 WORKDIR /app
 
-# Copy only package.json and pnpm-lock.yaml to leverage Docker cache
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./packages ./agent ./client ./
-
-# Install dependencies
-RUN pnpm install --no-frozen-lockfile
-
 # Copy the rest of the application code
 COPY . .
+
+# Install dependencies
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+ pnpm install --no-frozen-lockfile
 
 # Build the project
 RUN pnpm run build
