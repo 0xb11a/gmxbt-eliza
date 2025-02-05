@@ -46,13 +46,13 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} " \
             cd ${{ env.appFolder }} && \
             export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} && \
-            export OPENAI_API_KEY=${{ secrets.TWITTER_PASSWORD }} && \
-            export OPENAI_API_KEY=${{ secrets.TWITTER_2FA_SECRET }} && \
+            export TWITTER_PASSWORD=${{ secrets.TWITTER_PASSWORD }} && \
+            export TWITTER_2FA_SECRET=${{ secrets.TWITTER_2FA_SECRET }} && \
             docker compose -f docker-compose-gmxbt.yaml down && \
             docker compose -p ${{ env.projectName }} -f docker-compose-gmxbt.yaml up -d --build"
 
       - name: Clean up unused Docker resources
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            docker system prune -f
+            docker image prune -af
           EOF
