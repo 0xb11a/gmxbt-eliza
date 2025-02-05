@@ -4,7 +4,6 @@ FROM node:23.3.0-slim AS builder
 # Install pnpm globally and necessary build tools
 RUN npm install -g pnpm@9.4.0 && \
     apt-get update && \
-    apt-get upgrade -y && \
     apt-get install -y \
         git \
         python3 \
@@ -34,11 +33,14 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 # Set the working directory
 WORKDIR /app
 
-# Copy application code
-COPY . .
+# Copy only package.json and pnpm-lock.yaml to leverage Docker cache
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
+
+# Copy the rest of the application code
+COPY . .
 
 # Build the project
 RUN pnpm run build
