@@ -34,11 +34,14 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 # Set the working directory
 WORKDIR /app
 
-# Copy application code
-COPY . .
+# Copy only package.json and pnpm-lock.yaml to leverage Docker cache
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
+
+# Copy the rest of the application code
+COPY . .
 
 # Build the project
 RUN pnpm run build && pnpm prune --prod
@@ -76,4 +79,4 @@ COPY --from=builder /app/characters ./characters
 EXPOSE 3000 5173
 
 # Command to start the application
-CMD ["sh", "-c", "pnpm start:gmxbt"]
+CMD ["pnpm", "start:gmxbt"]
